@@ -1,0 +1,9 @@
+{
+  "modelo": "glm_cambio_anc",
+  "formula": "part ~ C(tipo) + d_lag3 + lag_imput + d_gob + escolaridad + pct_indigena + pct_migrante + pct_sin_salud + sh_joven_lag3 + log_ln + ln_growth + C(tiposec)",
+  "offset_lg_lag6": true,
+  "anclado": true,
+  "delta_ancla_2027": 0.015853723016555014,
+  "scale": 30.652353574367933,
+  "n_obs": 264144
+}

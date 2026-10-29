@@ -1,0 +1,5 @@
+escenario,efecto_pp,part_nacional,votos_adicionales,secciones_rojas
+sin_intervencion,0.0,0.5183,0,14150
+intervencion_bajo,1.0,0.5208,246834,12564
+intervencion_medio,2.5,0.5245,617086,10393
+intervencion_alto,4.0,0.5283,987337,8531

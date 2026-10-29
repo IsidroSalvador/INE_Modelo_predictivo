@@ -1,0 +1,16 @@
+variable,importancia_porcentual
+participacion_hace_6_anios,46.7
+es_eleccion_presidencial,16.05
+participacion_hace_3_anios,15.01
+hay_eleccion_gobernador,7.18
+escolaridad_promedio,3.61
+hubo_gobernador_hace_6_anios,2.25
+porcentaje_jovenes,1.68
+tamano_padron_log,1.32
+crecimiento_padron,1.25
+es_seccion_imputada,1.14
+porcentaje_migrantes,1.02
+es_seccion_urbana,0.97
+porcentaje_poblacion_indigena,0.76
+porcentaje_sin_salud,0.66
+es_seccion_rural,0.41

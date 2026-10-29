@@ -1,0 +1,58 @@
+# Entornos virtuales
+.venv/
+venv/
+env/
+ENV/
+env.bak/
+venv.bak/
+
+# Bytecode y caches de Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.ipynb_checkpoints/
+
+# Datos pesados (>5 GB)
+data/
+*.parquet
+*.gpkg
+*.zip
+*.tar
+*.tar.gz
+*.7z
+*.rar
+
+# Archivos espaciales / cartográficos pesados
+*.shp
+*.shx
+*.dbf
+*.prj
+*.cpg
+*.geojson
+
+# Salidas pesadas generadas automáticamente
+outputs/maps/
+outputs/figures/
+# Si deseas ignorar todas las salidas generadas:
+# outputs/
+
+# Variables de entorno y credenciales
+.env
+.env.local
+*.env
+*.pem
+*.key
+
+# Archivos del sistema y del editor
+.DS_Store
+Thumbs.db
+desktop.ini
+.vscode/
+.idea/
+*.sublime-project
+*.sublime-workspace
+
