@@ -37,7 +37,7 @@ data/
 # Salidas pesadas generadas automáticamente
 outputs/maps/
 outputs/figures/
-# Si deseas ignorar todas las salidas generadas:
+
 # outputs/
 
 # Variables de entorno y credenciales
@@ -58,9 +58,9 @@ desktop.ini
 
 # Documentos y notas de trabajo locales
 docs/
-EXPLICACION_Y_GUIA_METODOLOGICA.md
-GUIA_REPORTE_METODOLOGICO.md
-DESCRIPCION_VARIABLES_CCPC.md
-IMPUTACION_Y_COBERTURA_SECCIONES.md
+*.aux
+*.log
+*.out
+*.synctex.gz
 
 
