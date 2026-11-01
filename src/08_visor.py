@@ -1,9 +1,5 @@
-"""Paso 8: genera el visor web (un solo archivo HTML, se abre con doble clic).
+"""Ensamblaje del visor web interactivo standalone (outputs/maps/visor.html)."""
 
-Mete los GeoJSON de municipios y distritos dentro del HTML para que funcione
-sin servidor. Usa Leaflet (librería de mapas) desde internet.
-Salida: outputs/maps/visor.html
-"""
 import json
 import pandas as pd
 from config import OUT_MAP, OUT_TAB

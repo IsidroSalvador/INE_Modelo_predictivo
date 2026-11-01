@@ -56,3 +56,11 @@ desktop.ini
 *.sublime-project
 *.sublime-workspace
 
+# Documentos y notas de trabajo locales
+docs/
+EXPLICACION_Y_GUIA_METODOLOGICA.md
+GUIA_REPORTE_METODOLOGICO.md
+DESCRIPCION_VARIABLES_CCPC.md
+IMPUTACION_Y_COBERTURA_SECCIONES.md
+
+

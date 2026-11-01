@@ -1,9 +1,5 @@
-"""Paso 6: cartografía. Extrae de los zips de la BGD del INE solo las capas que
-usamos (SECCION, MUNICIPIO, DISTRITO_FEDERAL) y las junta en un GeoPackage nacional.
+"""Extracción de capas vectoriales (SECCION, MUNICIPIO, DISTRITO_FEDERAL) de la BGD del INE."""
 
-Entrada : data/raw/cartografia/bgd_<ent>_Shapefile.zip  (cada zip trae un .7z)
-Salida  : data/interim/cartografia.gpkg  con capas 'seccion', 'municipio', 'distrito'
-"""
 import io
 import zipfile
 import geopandas as gpd
@@ -17,7 +13,6 @@ EXTRAIDO = CARPETA / "extraido"
 
 
 def extraer(zip_path):
-    """Saca del .7z solo los archivos de las capas que necesitamos."""
     with zipfile.ZipFile(zip_path) as z:
         datos_7z = z.read(z.namelist()[0])
     with py7zr.SevenZipFile(io.BytesIO(datos_7z)) as arch:
@@ -29,7 +24,7 @@ def extraer(zip_path):
 
 def main():
     zips = sorted(CARPETA.glob("bgd_*_Shapefile.zip"))
-    print(f"{len(zips)} zips encontrados")
+    print(f"{len(zips)} archivos zip encontrados")
     for zp in zips:
         print("  extrayendo", zp.name)
         extraer(zp)
@@ -39,10 +34,10 @@ def main():
         for shp in EXTRAIDO.rglob(f"{capa_shp}.shp"):
             g = gpd.read_file(shp)
             g.columns = [c.upper() if c != "geometry" else c for c in g.columns]
-            partes.append(g.to_crs(4326))          # todo a lat/lon (WGS84)
+            partes.append(g.to_crs(4326))
         nacional = gpd.GeoDataFrame(pd.concat(partes, ignore_index=True), crs=4326)
         nacional.to_file(INTERIM / "cartografia.gpkg", layer=capa_salida, driver="GPKG")
-        print(f"{capa_salida}: {len(nacional)} polígonos | columnas: {list(nacional.columns)}")
+        print(f"{capa_salida}: {len(nacional)} polígonos")
 
 
 if __name__ == "__main__":

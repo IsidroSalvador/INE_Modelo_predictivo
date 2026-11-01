@@ -1,15 +1,5 @@
-"""Paso 7: mapas, autocorrelación espacial (Moran) y archivos geográficos entregables.
+"""Generación de capas geoespaciales, autocorrelación espacial (I de Moran) y mapas estáticos."""
 
-Salidas:
-  outputs/maps/escenarios_seccion.gpkg     -> secciones con predicción, semáforo y escenarios
-  outputs/maps/municipios.geojson          -> municipios (simplificado, para el visor web)
-  outputs/maps/distritos.geojson           -> distritos federales (simplificado, para el visor)
-  outputs/figures/mapa_*.png               -> mapas estáticos para reporte y presentación
-  outputs/tables/moran.csv                 -> índice de Moran
-
-Semáforo municipal/distrital: se aplica la MISMA regla del semáforo por sección
-a la participación esperada del municipio (promedio ponderado por lista nominal).
-"""
 import geopandas as gpd
 import matplotlib.pyplot as plt
 from matplotlib.patches import Patch
@@ -28,7 +18,6 @@ def semaforo(pred, caida_pp, p20, p40):
 
 
 def agregar(df, llave):
-    """Suma por municipio o distrito, ponderando por lista nominal."""
     d = df.assign(w_pred=df.pred_2027 * df.LN, w_21=df.part_2021 * df.LN,
                   w_med=df.pred_interv_medio * df.LN,
                   LN_rojo=df.LN * (df.semaforo == "rojo"),
@@ -63,16 +52,13 @@ def main():
     df = pd.read_csv(PROCESSED / "base_anonimizada_seccion.csv")
     p20, p40 = df.pred_2027.quantile([0.20, 0.40])
 
-    # ---------- secciones ----------
     sec = gpd.read_file(GPKG, layer="seccion")[["ENTIDAD", "SECCION", "geometry"]]
     sec = sec.rename(columns={"ENTIDAD": "ent", "SECCION": "seccion"}).dissolve(["ent", "seccion"]).reset_index()
     sec = sec.merge(df, on=["ent", "seccion"], how="inner")
     print(f"Secciones con geometría: {len(sec)} de {len(df)} ({len(sec)/len(df):.1%})")
     sec.to_file(OUT_MAP / "escenarios_seccion.gpkg", layer="secciones", driver="GPKG")
 
-    # ---------- Moran: ¿el riesgo y los errores se agrupan en el espacio? ----------
-    # Vecinos = 8 secciones más cercanas (centroides). Se usa KNN para evitar islas.
-    cent = sec.to_crs(6372).geometry.centroid      # proyección métrica de México (INEGI)
+    cent = sec.to_crs(6372).geometry.centroid
     w = KNN.from_array(np.column_stack([cent.x, cent.y]), k=8)
     w.transform = "r"
     res = pd.read_parquet(PROCESSED / "residuos_validacion.parquet")
@@ -82,15 +68,15 @@ def main():
     ok = s2.error.notna().values
     if ok.all():
         filas.append({"variable": "error_validacion_2024", **_moran(s2.error.values, w)})
-    else:  # si faltan algunas, se calculan vecinos solo con las que tienen error
+    else:
         c2 = cent[ok]
-        w2 = KNN.from_array(np.column_stack([c2.x, c2.y]), k=8); w2.transform = "r"
+        w2 = KNN.from_array(np.column_stack([c2.x, c2.y]), k=8)
+        w2.transform = "r"
         filas.append({"variable": "error_validacion_2024", **_moran(s2.error.values[ok], w2)})
     moran = pd.DataFrame(filas)
     moran.to_csv(OUT_TAB / "moran.csv", index=False)
     print(moran)
 
-    # ---------- municipios y distritos ----------
     mun_geo = gpd.read_file(GPKG, layer="municipio")[["ENTIDAD", "MUNICIPIO", "NOMBRE", "geometry"]]
     mun_geo = mun_geo.rename(columns={"ENTIDAD": "ent", "MUNICIPIO": "mun", "NOMBRE": "nombre"})
     mun = mun_geo.merge(agregar(df, ["ent", "mun"]), on=["ent", "mun"], how="left")
@@ -103,24 +89,23 @@ def main():
         g["semaforo"] = semaforo(g.pred_2027, (g.pred_2027 - g.part_2021) * 100, p20, p40)
         g["semaforo_medio"] = semaforo(g.pred_interv_medio, (g.pred_interv_medio - g.part_2021) * 100, p20, p40)
         g.loc[g.pred_2027.isna(), ["semaforo", "semaforo_medio"]] = "sin_dato"
-        g.geometry = g.geometry.simplify(0.003, preserve_topology=True)   # aligera para el visor
+        g.geometry = g.geometry.simplify(0.003, preserve_topology=True)
         for c in g.select_dtypes("float").columns:
             g[c] = g[c].round(4)
     mun.to_file(OUT_MAP / "municipios.geojson", driver="GeoJSON")
     dis.to_file(OUT_MAP / "distritos.geojson", driver="GeoJSON")
-    print("Municipios por semáforo:", mun.semaforo.value_counts().to_dict())
 
-    # ---------- mapas estáticos ----------
     COLORES["sin_dato"] = "#cccccc"
     mapa(mun, "semaforo", "Semáforo de riesgo de abstención 2027 (municipios, sin intervención)",
          "mapa_semaforo_municipal.png")
     fig, axes = plt.subplots(1, 2, figsize=(18, 7))
     mapa(dis, "semaforo", "Distritos 2027 – sin intervención", None, axes[0])
     mapa(dis, "semaforo_medio", "Distritos 2027 – con intervención (efecto medio +2.5 pp)", None, axes[1])
-    plt.tight_layout(); plt.savefig(OUT_FIG / "mapa_escenarios_distritos.png", dpi=200); plt.close()
+    plt.tight_layout()
+    plt.savefig(OUT_FIG / "mapa_escenarios_distritos.png", dpi=200)
+    plt.close()
     tij = sec[(sec.ent == 2) & (sec.mun == 4)]
     mapa(tij, "semaforo", "Tijuana: semáforo por sección (sin intervención)", "mapa_tijuana_secciones.png")
-    print("Mapas guardados en outputs/figures")
 
 
 def _moran(valores, w):

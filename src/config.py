@@ -1,4 +1,4 @@
-"""Rutas y constantes compartidas del proyecto."""
+"""Rutas y constantes del proyecto."""
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -14,7 +14,6 @@ YEARS = [2009, 2012, 2015, 2018, 2021, 2024]
 TIPO_ELECCION = {2009: "intermedia", 2012: "presidencial", 2015: "intermedia",
                  2018: "presidencial", 2021: "intermedia", 2024: "presidencial"}
 
-# Cortes de edad para indicadores agregados (jóvenes = foco del concurso, 18-35)
 EDAD_BINS = [17, 24, 34, 49, 64, 200]
 EDAD_LABELS = ["18_24", "25_34", "35_49", "50_64", "65m"]
 
